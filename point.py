@@ -1,41 +1,75 @@
+from module.algo.jarvis import jarvis
+from operator import sub
+from PyQt5 import QtGui
 from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsItem, QGraphicsScene
-from PyQt5.QtCore import QAbstractListModel, QPointF, QVariant, Qt
-
+from PyQt5.QtCore import QAbstractListModel, QPointF, QVariant, Qt, QModelIndex, QLineF
+from module.models.point import Point
+from polygon import PolygonModel, PolygonGraphicsItem
 
 class PointListModel(QAbstractListModel):
     radius = 10
-    def __init__(self, point_list=[], scene=None, parent=None, *args):
+    
+    def __init__(self, points=[], scene=None, parent=None, *args):
         QAbstractListModel.__init__(self, parent, *args)
-        self.point_list = point_list
+        self.points = points
         self.scene = scene
 
     def rowCount(self, parent=None) -> int:
-        return len(self.point_list)
+        return len(self.points)
 
     def data(self, index, role):
         if index.isValid() and role == Qt.DisplayRole:
-            return QVariant(str(self.point_list[index.row()]))
+            return QVariant(str(self.points[index.row()]))
         if index.isValid() and role == Qt.UserRole:
-            return self.point_list[index.row()].x, self.point_list[index.row()].y
+            return self.points[index.row()].x, self.points[index.row()].y
         return QVariant()
 
     def setData(self, index, value, role: int) -> bool:
         super().setData(index, value, role=role)
         if isinstance(value, QPointF):
-            self.point_list[index.row()].coords = (value.x(), value.y())
+            self.points[index.row()].coords = (value.x(), value.y())
         self.dataChanged.emit(index, index, [role])
     
+    def addPoint(self, point):
+        self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
+        self.points.append(point)
+        self.endInsertRows()
+
 
 class PointScene(QGraphicsScene):
     def __init__(self, point_model):
         QGraphicsScene.__init__(self)
         self.point_model = point_model
+        self.polygon_model = PolygonModel(points=[])
+        self.polygon = None
         self.addItems()
+
+    '''Add a new point on mouse double-click'''
+    def mouseDoubleClickEvent(self, event):
+        x, y = event.scenePos().x(), event.scenePos().y()
+        self.point_model.addPoint(Point(x, y))
+        index = self.point_model.index(self.point_model.rowCount() - 1)
+        self.addItem(PointGraphicsItem(self.point_model, index))
+        if self.polygon:
+            self.constructConvexHull()
 
     def addItems(self):
         for row in range(self.point_model.rowCount()):
             index = self.point_model.index(row)
             self.addItem(PointGraphicsItem(self.point_model, index))
+
+    def constructConvexHull(self, hull_method=jarvis):
+        hull = hull_method(self.point_model.points)
+        h_pts = []
+
+        for i in range(len(hull)):
+            self.polygon_model.addPoint(hull[i])
+            ind = self.point_model.points.index(hull[i])
+            h_pts.append(QPointF(self.point_model.points[ind].x, self.point_model.points[ind].y))
+
+        self.removeItem(self.polygon)
+        self.polygon = PolygonGraphicsItem(h_pts)
+        self.addItem(self.polygon)
 
 
 class PointGraphicsItem(QGraphicsEllipseItem):
@@ -44,7 +78,9 @@ class PointGraphicsItem(QGraphicsEllipseItem):
         self.point_model=point_model
         self.index = index
         super().__init__(0, 0, 2*self.rad, 2*self.rad)
-        self.moveBy(*self.get_point_data())
+
+        shift = tuple(map(sub, self.get_point_data(), (self.rad, self.rad)))
+        self.moveBy(*shift)
         self.setFlag(QGraphicsItem.ItemIsMovable)
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges)
         self.setBrush(Qt.green)
