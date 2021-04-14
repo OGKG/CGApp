@@ -1,8 +1,7 @@
 from module.algo.jarvis import jarvis
 from operator import sub
-from PyQt5 import QtGui
 from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsItem, QGraphicsScene
-from PyQt5.QtCore import QAbstractListModel, QPointF, QVariant, Qt, QModelIndex, QLineF
+from PyQt5.QtCore import QAbstractListModel, QPointF, QVariant, Qt, QModelIndex
 from module.models.point import Point
 from polygon import PolygonModel, PolygonGraphicsItem
 
@@ -49,19 +48,19 @@ class PointScene(QGraphicsScene):
         x, y = event.scenePos().x(), event.scenePos().y()
         self.point_model.addPoint(Point(x, y))
         index = self.point_model.index(self.point_model.rowCount() - 1)
-        self.addItem(PointGraphicsItem(self.point_model, index))
+        self.addItem(PointGraphicsItem(self.point_model, self, index))
         if self.polygon:
             self.constructConvexHull()
 
     def addItems(self):
         for row in range(self.point_model.rowCount()):
             index = self.point_model.index(row)
-            self.addItem(PointGraphicsItem(self.point_model, index))
+            self.addItem(PointGraphicsItem(self.point_model, self, index))
 
     def constructConvexHull(self, hull_method=jarvis):
         hull = hull_method(self.point_model.points)
         h_pts = []
-
+        
         for i in range(len(hull)):
             self.polygon_model.addPoint(hull[i])
             ind = self.point_model.points.index(hull[i])
@@ -74,16 +73,25 @@ class PointScene(QGraphicsScene):
 
 class PointGraphicsItem(QGraphicsEllipseItem):
     rad = 5
-    def __init__(self, point_model, index):
+    def __init__(self, point_model, scene, index):
         self.point_model=point_model
+        self.scene = scene
         self.index = index
         super().__init__(0, 0, 2*self.rad, 2*self.rad)
-
         shift = tuple(map(sub, self.get_point_data(), (self.rad, self.rad)))
         self.moveBy(*shift)
         self.setFlag(QGraphicsItem.ItemIsMovable)
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges)
-        self.setBrush(Qt.green)
+        self.setBrush(Qt.blue)
+
+    def mouseMoveEvent(self, event):
+        self.moveBy(-self.rad, -self.rad)
+        if self.scene.polygon:
+            self.scene.constructConvexHull()
+        return super().mouseMoveEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        return super().mouseReleaseEvent(event)
 
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
         self.point_model.setData(self.index, value, Qt.UserRole)

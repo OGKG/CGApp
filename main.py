@@ -3,6 +3,24 @@ from module.algo.jarvis import jarvis
 from PyQt5.QtWidgets import QApplication, QGraphicsView, QHBoxLayout, QListView, QVBoxLayout, QWidget, QPushButton
 from point import PointListModel, PointScene
 
+class GraphicsView(QGraphicsView):
+    def mousePressEvent(self, event):
+        self.setDragMode(QGraphicsView.DragMode.ScrollHandDrag)
+        return super().mousePressEvent(event)
+    
+    def mouseReleaseEvent(self, event):
+        self.setDragMode(QGraphicsView.DragMode.NoDrag)
+        return super().mouseReleaseEvent(event)
+    
+    def wheelEvent(self, event):
+        if event.angleDelta().y() > 0:
+            factor = 1.25
+        else:
+            factor = 0.8
+        
+        self.scale(factor, factor)
+            
+
 class Main(QWidget):
     def __init__(self):
         super().__init__()
@@ -24,7 +42,7 @@ class Main(QWidget):
         v_layout.addWidget(hullButton)
         layout.addLayout(v_layout)
 
-        view = QGraphicsView()
+        view = GraphicsView()
         view.setScene(scene)
         layout.addWidget(view)
         self.setLayout(layout)
