@@ -42,6 +42,7 @@ class PointScene(QGraphicsScene):
         self.point_model = point_model
         self.polygon_model = PolygonModel(points=[])
         self.polygon = PolygonGraphicsItem([])
+        self.polygon.setZValue(-1)
         self.addItems()
         self.addItem(self.polygon)
 
