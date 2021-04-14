@@ -24,10 +24,10 @@ class PointListModel(QAbstractListModel):
             return self.points[index.row()].x, self.points[index.row()].y
         return QVariant()
 
-    def setData(self, index, value, role: int) -> bool:
+    def setData(self, index, value, role: int, radius) -> bool:
         super().setData(index, value, role=role)
         if isinstance(value, QPointF):
-            self.points[index.row()].coords = (value.x(), value.y())
+            self.points[index.row()].coords = (value.x()+radius, value.y()+radius)
         self.dataChanged.emit(index, index, [role])
     
     def addPoint(self, point):
@@ -81,7 +81,7 @@ class PointGraphicsItem(QGraphicsEllipseItem):
         self.setBrush(Qt.blue)
 
     def mouseMoveEvent(self, event):
-        self.moveBy(-self.rad, -self.rad)
+        # self.moveBy(-self.rad, -self.rad)
         if self.scene.polygon:
             self.scene.constructConvexHull()
         return super().mouseMoveEvent(event)
@@ -90,7 +90,7 @@ class PointGraphicsItem(QGraphicsEllipseItem):
         return super().mouseReleaseEvent(event)
 
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
-        self.point_model.setData(self.index, value, Qt.UserRole)
+        self.point_model.setData(self.index, value, Qt.UserRole, self.rad)
         return super().itemChange(change, value)
 
     def get_point_data(self):
