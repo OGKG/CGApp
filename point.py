@@ -66,7 +66,8 @@ class PointScene(QGraphicsScene):
             ind = self.point_model.points.index(hull[i])
             h_pts.append(QPointF(self.point_model.points[ind].x, self.point_model.points[ind].y))
 
-        self.removeItem(self.polygon)
+        if self.polygon:
+            self.removeItem(self.polygon)
         self.polygon = PolygonGraphicsItem(h_pts)
         self.addItem(self.polygon)
 
