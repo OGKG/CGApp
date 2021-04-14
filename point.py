@@ -59,15 +59,14 @@ class PointScene(QGraphicsScene):
 
     def constructConvexHull(self, hull_method=jarvis):
         hull = hull_method(self.point_model.points)
-        h_pts = []
+        hull_points = []
         
-        for i in range(len(hull)):
-            self.polygon_model.addPoint(hull[i])
-            ind = self.point_model.points.index(hull[i])
-            h_pts.append(QPointF(self.point_model.points[ind].x, self.point_model.points[ind].y))
+        for point in hull:
+            self.polygon_model.addPoint(point)
+            hull_points.append(QPointF(*point.coords))
 
         self.removeItem(self.polygon)
-        self.polygon = PolygonGraphicsItem(h_pts)
+        self.polygon = PolygonGraphicsItem(hull_points)
         self.addItem(self.polygon)
 
 
