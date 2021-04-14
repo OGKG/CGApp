@@ -1,3 +1,4 @@
+from PyQt5.QtGui import QPainter
 from module.models.point import Point
 from module.algo.jarvis import jarvis
 from PyQt5.QtWidgets import QApplication, QGraphicsView, QHBoxLayout, QListView, QVBoxLayout, QWidget, QPushButton
@@ -6,6 +7,7 @@ from point import PointListModel, PointScene
 class GraphicsView(QGraphicsView):
     def mousePressEvent(self, event):
         self.setDragMode(QGraphicsView.DragMode.ScrollHandDrag)
+        self.setRenderHint(QPainter.RenderHint.Antialiasing, True)
         return super().mousePressEvent(event)
     
     def mouseReleaseEvent(self, event):
