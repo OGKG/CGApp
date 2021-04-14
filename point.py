@@ -1,6 +1,7 @@
+from PyQt5.QtGui import QPolygonF
 from module.algo.jarvis import jarvis
 from operator import sub
-from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsItem, QGraphicsScene
+from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsItem, QGraphicsPolygonItem, QGraphicsScene
 from PyQt5.QtCore import QAbstractListModel, QPointF, QVariant, Qt, QModelIndex
 from module.models.point import Point
 from polygon import PolygonModel, PolygonGraphicsItem
@@ -40,8 +41,9 @@ class PointScene(QGraphicsScene):
         QGraphicsScene.__init__(self)
         self.point_model = point_model
         self.polygon_model = PolygonModel(points=[])
-        self.polygon = None
+        self.polygon = PolygonGraphicsItem([])
         self.addItems()
+        self.addItem(self.polygon)
 
     '''Add a new point on mouse double-click'''
     def mouseDoubleClickEvent(self, event):
@@ -58,16 +60,11 @@ class PointScene(QGraphicsScene):
             self.addItem(PointGraphicsItem(self.point_model, self, index))
 
     def constructConvexHull(self, hull_method=jarvis):
-        hull = hull_method(self.point_model.points)
-        hull_points = []
-        
-        for point in hull:
-            self.polygon_model.addPoint(point)
-            hull_points.append(QPointF(*point.coords))
-
-        self.removeItem(self.polygon)
-        self.polygon = PolygonGraphicsItem(hull_points)
-        self.addItem(self.polygon)
+        self.polygon.setPolygon(
+            QPolygonF(
+                (QPointF(*point.coords) for point in hull_method(self.point_model.points))
+            )
+        )
 
 
 class PointGraphicsItem(QGraphicsEllipseItem):
