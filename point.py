@@ -82,12 +82,13 @@ class PointGraphicsItem(QGraphicsEllipseItem):
         self.setBrush(Qt.blue)
 
     def mouseMoveEvent(self, event):
-        # self.moveBy(-self.rad, -self.rad)
         if self.scene.polygon:
             self.scene.constructConvexHull()
         return super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
+        if self.scene.polygon:
+            self.scene.constructConvexHull()
         return super().mouseReleaseEvent(event)
 
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):

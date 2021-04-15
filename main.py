@@ -5,6 +5,13 @@ from PyQt5.QtWidgets import QApplication, QGraphicsView, QHBoxLayout, QListView,
 from point import PointListModel, PointScene
 
 class GraphicsView(QGraphicsView):
+    def __init__(self, parent=None):
+        super(GraphicsView, self).__init__(parent)
+
+    def mouseDoubleClickEvent(self, event) -> None:
+        self.setDragMode(QGraphicsView.DragMode.NoDrag)
+        return super().mouseDoubleClickEvent(event)
+
     def mousePressEvent(self, event):
         self.setDragMode(QGraphicsView.DragMode.ScrollHandDrag)
         self.setRenderHint(QPainter.RenderHint.Antialiasing, True)
