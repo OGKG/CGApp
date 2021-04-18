@@ -9,10 +9,9 @@ from polygon import PolygonModel, PolygonGraphicsItem
 class PointListModel(QAbstractListModel):
     radius = 10
     
-    def __init__(self, points=[], scene=None, parent=None, *args):
+    def __init__(self, points=[], parent=None, *args):
         QAbstractListModel.__init__(self, parent, *args)
         self.points = points
-        self.scene = scene
 
     def rowCount(self, parent=None) -> int:
         return len(self.points)
@@ -51,14 +50,14 @@ class PointScene(QGraphicsScene):
         x, y = event.scenePos().x(), event.scenePos().y()
         self.point_model.addPoint(Point(x, y))
         index = self.point_model.index(self.point_model.rowCount() - 1)
-        self.addItem(PointGraphicsItem(self.point_model, self, index))
+        self.addItem(HullPointGraphicsItem(self.point_model, self, index))
         if self.polygon:
             self.constructConvexHull()
 
     def addItems(self):
         for row in range(self.point_model.rowCount()):
             index = self.point_model.index(row)
-            self.addItem(PointGraphicsItem(self.point_model, self, index))
+            self.addItem(HullPointGraphicsItem(self.point_model, self, index))
 
     def constructConvexHull(self, hull_method=jarvis):
         self.polygon.setPolygon(
@@ -81,6 +80,14 @@ class PointGraphicsItem(QGraphicsEllipseItem):
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges)
         self.setBrush(Qt.blue)
 
+    def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
+        self.point_model.setData(self.index, value, Qt.UserRole, self.rad)
+        return super().itemChange(change, value)
+
+    def get_point_data(self):
+        return self.point_model.data(self.index, Qt.UserRole)
+
+class HullPointGraphicsItem(PointGraphicsItem):
     def mouseMoveEvent(self, event):
         if self.scene.polygon:
             self.scene.constructConvexHull()
@@ -90,10 +97,3 @@ class PointGraphicsItem(QGraphicsEllipseItem):
         if self.scene.polygon:
             self.scene.constructConvexHull()
         return super().mouseReleaseEvent(event)
-
-    def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
-        self.point_model.setData(self.index, value, Qt.UserRole, self.rad)
-        return super().itemChange(change, value)
-
-    def get_point_data(self):
-        return self.point_model.data(self.index, Qt.UserRole)

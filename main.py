@@ -1,12 +1,13 @@
+from task_scene.kd_tree_scene import KdTreeNodeGraphicsItem
 from PyQt5.QtGui import QPainter
 from module.models.point import Point
 from module.algo.jarvis import jarvis
 from PyQt5.QtWidgets import QApplication, QGraphicsView, QHBoxLayout, QListView, QVBoxLayout, QWidget, QPushButton
 from point import PointListModel, PointScene
 
-class GraphicsView(QGraphicsView):
+class PointGraphicsView(QGraphicsView):
     def __init__(self, parent=None):
-        super(GraphicsView, self).__init__(parent)
+        super(PointGraphicsView, self).__init__(parent)
 
     def mouseDoubleClickEvent(self, event) -> None:
         self.setDragMode(QGraphicsView.DragMode.NoDrag)
@@ -46,12 +47,12 @@ class Main(QWidget):
         v_layout = QVBoxLayout()
         v_layout.addWidget(listView)
         scene = PointScene(model)
-        
+
         hullButton.clicked.connect(lambda: onClick(scene))
         v_layout.addWidget(hullButton)
         layout.addLayout(v_layout)
 
-        view = GraphicsView()
+        view = PointGraphicsView()
         view.setScene(scene)
         layout.addWidget(view)
         self.setLayout(layout)
