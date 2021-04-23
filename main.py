@@ -1,9 +1,8 @@
-from task_scene.kd_tree_scene import KdTreeNodeGraphicsItem
 from PyQt5.QtGui import QPainter
 from module.models.point import Point
 from module.algo.jarvis import jarvis
 from PyQt5.QtWidgets import QApplication, QGraphicsView, QHBoxLayout, QListView, QVBoxLayout, QWidget, QPushButton
-from point import PointListModel, PointScene
+from base.point import PointListModel, PointScene
 
 class PointGraphicsView(QGraphicsView):
     def __init__(self, parent=None):

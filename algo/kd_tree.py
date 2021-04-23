@@ -1,7 +1,66 @@
-from operator import sub
 from PyQt5.QtCore import QLineF, QPointF, Qt
-from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsLineItem, QGraphicsScene, QGraphicsSceneMouseEvent, QInputDialog
-from base.point_scene import PointGraphicsItem
+from main import PointGraphicsView
+from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsLineItem, QGraphicsScene, QGraphicsView, QInputDialog, QLineEdit
+from base.task_layout import TaskLayout
+from module.models.bin_tree_node import Node
+from module.models.bin_tree import KdTree
+from base.task_model import TaskModel
+from operator import sub
+
+
+class KdTreeTaskLayout(TaskLayout):
+    def __init__(self, point_model, task_model, parent=None):
+        super(KdTreeTaskLayout, self).__init__(point_model, task_model, None, parent)
+        self.xListInput = QLineEdit()
+        self.yListInput = QLineEdit()
+        
+        self.partitionScene = KdTreePartitionScene(point_model, task_model)
+        self.treeScene = KdTreeScene(point_model, task_model)
+        
+        graphics_view = KdTreeGraphicsView()
+        graphics_view.setScene(self.partitionScene)
+        self.vlayout_input.addWidget(graphics_view)
+        self.vlayout_right.addLayout(self.vlayout_input)
+        self.stageLayouts = []
+
+        self.addLayout(self.vlayout_left)
+        self.addLayout(self.vlayout_right)
+
+        
+class KdTreeGraphicsView(QGraphicsView):
+    def wheelEvent(self, event):
+        if event.angleDelta().y() > 0:
+            factor = 1.25
+        else:
+            factor = 0.8
+        
+        self.scale(factor, factor)
+
+class KdTreeTaskModel(TaskModel):
+    fines = [0.25, 0.75, 1, 1]
+    extra_fines = [0, 0, 0, 0]
+    
+    def __init__(self, points, x_range, y_range, parent=None, *args):
+        super(KdTreeTaskModel, self).__init__(points, parent, *args)
+        self.xList = []
+        self.yList = []
+        self.tree = KdTree(Node(None), x_range, y_range)
+        self.ans_points = []
+    
+    @property
+    def score(self):
+        res = 3
+        stages = [
+            (
+                self.xList,
+                self.yList
+            ),
+            self.tree.directions,
+            self.tree,
+            self.ans_points
+        ]
+
+        return self.evaluate(stages, res)
 
 
 class KdTreePartitionScene(QGraphicsScene):
@@ -42,7 +101,7 @@ class KdTreeScene(QGraphicsScene):
         return super().mousePressEvent(event)
 
 
-class KdTreePointGraphicsItem(PointGraphicsItem):
+class KdTreePointGraphicsItem(PointGraphicsView):
     rad = 5
 
     @property
