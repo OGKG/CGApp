@@ -1,8 +1,8 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPainter
-from module.models.point import Point
 from PyQt5.QtWidgets import QApplication, QGraphicsView, QHBoxLayout, QListView, QWidget
 from base.point import PointListModel, PointScene
+from module.models.point import Point
 
 
 class PointGraphicsView(QGraphicsView):
