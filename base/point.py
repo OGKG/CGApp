@@ -4,10 +4,9 @@ from operator import sub
 from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsItem, QGraphicsScene
 from PyQt5.QtCore import QAbstractListModel, QPointF, QVariant, Qt, QModelIndex
 from module.models.point import Point
-from .polygon import PolygonModel, PolygonGraphicsItem
+from .polygon import PolygonGraphicsItem
 
 class PointListModel(QAbstractListModel):
-    radius = 10
     
     def __init__(self, points=[], parent=None, *args):
         QAbstractListModel.__init__(self, parent, *args)
