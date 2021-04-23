@@ -1,6 +1,6 @@
 from task_scene.kd_tree_scene import KdTreePartitionScene, KdTreeScene
 from PyQt5.QtWidgets import QGraphicsView, QLineEdit
-from .task_layout import TaskLayout
+from base.task_layout import TaskLayout
 
 
 class KdTreeTaskLayout(TaskLayout):
@@ -15,7 +15,7 @@ class KdTreeTaskLayout(TaskLayout):
         graphics_view = KdTreeGraphicsView()
         graphics_view.setScene(self.partitionScene)
         self.vlayout_input.addWidget(graphics_view)
-        self.vlayout_left.addLayout(self.vlayout_input)
+        self.vlayout_right.addLayout(self.vlayout_input)
         self.stageLayouts = []
 
         self.addLayout(self.vlayout_left)

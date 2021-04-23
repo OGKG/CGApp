@@ -1,8 +1,7 @@
 from operator import sub
-from PyQt5.QtCore import QLine, QLineF, QPointF, QRectF, Qt, right
-from PyQt5.QtGui import QMouseEvent, QPainter, QPen
-from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsItem, QGraphicsLineItem, QGraphicsScene, QGraphicsSceneMouseEvent, QInputDialog
-from .point_scene import PointGraphicsItem
+from PyQt5.QtCore import QLineF, QPointF, Qt
+from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsLineItem, QGraphicsScene, QGraphicsSceneMouseEvent, QInputDialog
+from base.point_scene import PointGraphicsItem
 
 
 class KdTreePartitionScene(QGraphicsScene):
@@ -44,11 +43,13 @@ class KdTreeScene(QGraphicsScene):
 
 
 class KdTreePointGraphicsItem(PointGraphicsItem):
-    def __init__(self, point_model, scene, index):
-        super().__init__(point_model, scene, index)
-        self.setFlag(QGraphicsItem.ItemIsMovable, False)
+    rad = 5
 
-    def mousePressEvent(self, event) -> None:
+    @property
+    def point_data(self):
+        return self.point_model.data(self.index, Qt.UserRole)
+
+    def mousePressEvent(self, event):
         line = None
         direction = True
         

@@ -1,6 +1,6 @@
 from module.models.bin_tree_node import Node
 from module.models.bin_tree import KdTree
-from .task_model import TaskModel
+from base.task_model import TaskModel
 
 
 class KdTreeTaskModel(TaskModel):
