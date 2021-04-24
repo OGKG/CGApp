@@ -1,7 +1,7 @@
 from module.algo.quickhull import quickhull_gen
 from module.models.bin_tree_node import Node
 from module.models.bin_tree import BinTree
-from .task_model import TaskModel
+from base.task_model import TaskModel
 
 
 class QuickhullTaskModel(TaskModel):
@@ -37,5 +37,3 @@ class QuickhullTaskModel(TaskModel):
         ]
 
         return self.evaluate(stages, res)
-
-

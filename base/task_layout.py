@@ -1,5 +1,5 @@
 from main import PointGraphicsView
-from point import PointListModel, PointScene
+from task_scene.point_scene import PointScene
 from PyQt5.QtWidgets import QHBoxLayout, QListView, QPushButton, QVBoxLayout
 
 
@@ -26,7 +26,7 @@ class TaskLayout(QHBoxLayout):
         self.point_scene = PointScene(self.point_model)
         self.points_view = PointGraphicsView()
         self.points_view.setScene(self.point_scene)
-        self.vlayout_right.addWidget(self.points_view)
+        self.vlayout_left.addWidget(self.points_view)
 
         self.btn_next = QPushButton("Далі")
         self.btn_next.clicked.connect(self.onBtnNextClick)
