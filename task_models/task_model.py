@@ -2,8 +2,9 @@ from PyQt5.QtCore import QAbstractListModel
 
 
 class TaskModel(QAbstractListModel):
-    def __init__(self, points, parent=None, *args):
+    def __init__(self, points, edges=None, parent=None, *args):
         QAbstractListModel.__init__(self, parent, *args)
+        self.edges = edges
         self.points = points
         self.stages = []
         self.correct_stages = []
