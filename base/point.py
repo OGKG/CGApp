@@ -2,7 +2,7 @@ from PyQt5.QtGui import QPolygonF
 from module.algo.jarvis import jarvis
 from operator import sub
 from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsItem, QGraphicsScene
-from PyQt5.QtCore import QAbstractListModel, QPointF, QVariant, Qt, QModelIndex
+from PyQt5.QtCore import QAbstractListModel, QPersistentModelIndex, QPointF, QVariant, Qt, QModelIndex
 from module.models.point import Point
 from .polygon import PolygonGraphicsItem
 
@@ -23,15 +23,32 @@ class PointListModel(QAbstractListModel):
         return QVariant()
 
     def setData(self, index, value, role: int, radius) -> bool:
-        super().setData(index, value, role=role)
+        self.beginResetModel()
+        super().setData(QModelIndex(index), value, role=role)
         if isinstance(value, QPointF):
             self.points[index.row()].coords = (value.x()+radius, value.y()+radius)
         self.dataChanged.emit(index, index, [role])
-    
+        self.endResetModel()
+
+    def setDataByPoint(self, point, value, role, radius):
+        self.beginResetModel()
+        index = self.index(self.points.index(point), 0, QModelIndex())
+        if isinstance(value, QPointF):
+            point.coords = (value.x()+radius, value.y()+radius)
+        self.dataChanged.emit(index, index, [role])
+        self.endResetModel()
+
+
     def addPoint(self, point):
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
         self.points.append(point)
         self.endInsertRows()
+
+    def remove(self, point):
+        self.beginRemoveRows(QModelIndex(), 0, self.rowCount())
+        self.points.remove(point)
+        self.endRemoveRows()
+
 
 
 class PointScene(QGraphicsScene):
@@ -68,18 +85,26 @@ class PointGraphicsItem(QGraphicsEllipseItem):
     def __init__(self, point_model, scene, index):
         self.point_model=point_model
         self.scene = scene
-        self.index = index
+        self.point = point_model.points[index.row()]
         super().__init__(0, 0, 2*self.rad, 2*self.rad)
-        shift = tuple(map(sub, self.get_point_data(), (self.rad, self.rad)))
+        shift = tuple(map(sub, (self.point.coords), (self.rad, self.rad)))
         self.moveBy(*shift)
         self.setFlag(QGraphicsItem.ItemIsMovable)
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges)
         self.setBrush(Qt.blue)
 
-    def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
-        self.point_model.setData(self.index, value, Qt.UserRole, self.rad)
-        self.scene.constructConvexHull()
-        return super().itemChange(change, value)
+    def mousePressEvent(self, event):
+        self.prepareGeometryChange()
+        if event.button() == Qt.RightButton:
+            self.point_model.remove(self.point)
+            self.scene.removeItem(self)
+            self.scene.constructConvexHull()
+            del self
 
-    def get_point_data(self):
-        return self.point_model.data(self.index, Qt.UserRole)
+    def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
+        if change != QGraphicsItem.GraphicsItemChange.ItemSceneChange\
+        and change != QGraphicsItem.GraphicsItemChange.ItemSceneHasChanged:
+            self.prepareGeometryChange()
+            self.point_model.setDataByPoint(self.point, value, Qt.UserRole, self.rad)
+            self.scene.constructConvexHull()
+        return super().itemChange(change, value)
