@@ -1,8 +1,8 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPainter
 from PyQt5.QtWidgets import QApplication, QGraphicsView, QHBoxLayout, QListView, QWidget
-from base.point import PointListModel, PointScene
-from module.models.point import Point
+from base.point import PointListModel
+from algo.hull import JarvisPointScene, GrahamPointScene
 
 
 class PointGraphicsView(QGraphicsView):
@@ -24,7 +24,7 @@ class PointGraphicsView(QGraphicsView):
 class Main(QWidget):
     def __init__(self):
         super().__init__()
-        model = PointListModel([Point(1,1), Point(100,100)])
+        model = PointListModel()
         listView = QListView()
         listView.setModel(model)
 
@@ -32,7 +32,7 @@ class Main(QWidget):
         layout.addWidget(listView)
 
         view = PointGraphicsView()
-        view.setScene(PointScene(model))
+        view.setScene(GrahamPointScene(model))
         layout.addWidget(view)
         self.setLayout(layout)
 

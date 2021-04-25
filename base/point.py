@@ -1,10 +1,8 @@
-from PyQt5.QtGui import QPolygonF
-from module.algo.jarvis import jarvis
 from operator import sub
 from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsItem, QGraphicsScene
-from PyQt5.QtCore import QAbstractListModel, QPersistentModelIndex, QPointF, QVariant, Qt, QModelIndex
+from PyQt5.QtCore import QAbstractListModel, QPointF, QVariant, Qt, QModelIndex
 from module.models.point import Point
-from .polygon import PolygonGraphicsItem
+
 
 class PointListModel(QAbstractListModel):
     
@@ -55,12 +53,7 @@ class PointScene(QGraphicsScene):
     def __init__(self, point_model):
         QGraphicsScene.__init__(self)
         self.point_model = point_model
-        self.polygon = PolygonGraphicsItem([])
-        self.polygon.setZValue(-1)
-        self.addItems()
-        self.addItem(self.polygon)
 
-    '''Add a new point on mouse double-click'''
     def mouseDoubleClickEvent(self, event):
         x, y = event.scenePos().x(), event.scenePos().y()
         self.point_model.addPoint(Point(x, y))
@@ -71,13 +64,6 @@ class PointScene(QGraphicsScene):
         for row in range(self.point_model.rowCount()):
             index = self.point_model.index(row)
             self.addItem(PointGraphicsItem(self.point_model, self, index))
-
-    def constructConvexHull(self, hull_method=jarvis):
-        self.polygon.setPolygon(
-            QPolygonF(
-                (QPointF(*point.coords) for point in hull_method(self.point_model.points))
-            )
-        )
 
 
 class PointGraphicsItem(QGraphicsEllipseItem):
@@ -98,7 +84,7 @@ class PointGraphicsItem(QGraphicsEllipseItem):
         if event.button() == Qt.RightButton:
             self.point_model.remove(self.point)
             self.scene.removeItem(self)
-            self.scene.constructConvexHull()
+            self.scene.refresh()
             del self
 
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
@@ -106,5 +92,5 @@ class PointGraphicsItem(QGraphicsEllipseItem):
         and change != QGraphicsItem.GraphicsItemChange.ItemSceneHasChanged:
             self.prepareGeometryChange()
             self.point_model.setDataByPoint(self.point, value, Qt.UserRole, self.rad)
-            self.scene.constructConvexHull()
+            self.scene.refresh()
         return super().itemChange(change, value)
