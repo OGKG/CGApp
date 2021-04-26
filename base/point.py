@@ -51,7 +51,6 @@ class PointGraphicsItem(QGraphicsEllipseItem):
     rad = 5
     def __init__(self, point_model, scene, index):
         super().__init__(-self.rad, -self.rad, 2*self.rad, 2*self.rad)
-        self.append_children()
         self.point_model=point_model
         self.scene = scene
         self.point = point_model.points[index.row()]
@@ -59,6 +58,7 @@ class PointGraphicsItem(QGraphicsEllipseItem):
         self.setFlag(QGraphicsItem.ItemIsMovable)
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges)
         self.setBrush(Qt.blue)
+        self.append_children()
     
     def append_children(self):
         pass
@@ -94,9 +94,4 @@ class PointScene(QGraphicsScene):
         self.point_model.addPoint(Point(x, y))
         index = self.point_model.index(self.point_model.rowCount() - 1)
         self.addItem(self.graphicsItemClass(self.point_model, self, index))
-
-    def addItems(self):
-        for row in range(self.point_model.rowCount()):
-            index = self.point_model.index(row)
-            self.addItem(self.graphicsItemClass(self.point_model, self, index))
 
