@@ -28,14 +28,13 @@ class PointListModel(QAbstractListModel):
         self.dataChanged.emit(index, index, [role])
         self.endResetModel()
 
-    def setDataByPoint(self, point, value, role, radius):
+    def setDataByPoint(self, point, value, role):
         self.beginResetModel()
         index = self.index(self.points.index(point), 0, QModelIndex())
         if isinstance(value, QPointF):
-            point.coords = (value.x()+radius, value.y()+radius)
+            point.coords = (value.x(), value.y())
         self.dataChanged.emit(index, index, [role])
         self.endResetModel()
-
 
     def addPoint(self, point):
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
@@ -48,36 +47,21 @@ class PointListModel(QAbstractListModel):
         self.endRemoveRows()
 
 
-
-class PointScene(QGraphicsScene):
-    def __init__(self, point_model):
-        QGraphicsScene.__init__(self)
-        self.point_model = point_model
-
-    def mouseDoubleClickEvent(self, event):
-        x, y = event.scenePos().x(), event.scenePos().y()
-        self.point_model.addPoint(Point(x, y))
-        index = self.point_model.index(self.point_model.rowCount() - 1)
-        self.addItem(PointGraphicsItem(self.point_model, self, index))
-
-    def addItems(self):
-        for row in range(self.point_model.rowCount()):
-            index = self.point_model.index(row)
-            self.addItem(PointGraphicsItem(self.point_model, self, index))
-
-
 class PointGraphicsItem(QGraphicsEllipseItem):
     rad = 5
     def __init__(self, point_model, scene, index):
+        super().__init__(-self.rad, -self.rad, 2*self.rad, 2*self.rad)
+        self.append_children()
         self.point_model=point_model
         self.scene = scene
         self.point = point_model.points[index.row()]
-        super().__init__(0, 0, 2*self.rad, 2*self.rad)
-        shift = tuple(map(sub, (self.point.coords), (self.rad, self.rad)))
-        self.moveBy(*shift)
+        self.moveBy(*self.point.coords)
         self.setFlag(QGraphicsItem.ItemIsMovable)
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges)
         self.setBrush(Qt.blue)
+    
+    def append_children(self):
+        pass
 
     def mousePressEvent(self, event):
         self.prepareGeometryChange()
@@ -88,9 +72,31 @@ class PointGraphicsItem(QGraphicsEllipseItem):
             del self
 
     def itemChange(self, change: QGraphicsItem.GraphicsItemChange, value):
+        if change == QGraphicsItem.GraphicsItemChange.ItemChildAddedChange or\
+            change == QGraphicsItem.GraphicsItemChange.ItemParentHasChanged:
+            return super().itemChange(change, value)
         if change != QGraphicsItem.GraphicsItemChange.ItemSceneChange\
         and change != QGraphicsItem.GraphicsItemChange.ItemSceneHasChanged:
             self.prepareGeometryChange()
-            self.point_model.setDataByPoint(self.point, value, Qt.UserRole, self.rad)
+            self.point_model.setDataByPoint(self.point, value, Qt.UserRole)
             self.scene.refresh()
         return super().itemChange(change, value)
+
+
+class PointScene(QGraphicsScene):
+    graphicsItemClass = PointGraphicsItem
+    def __init__(self, point_model):
+        QGraphicsScene.__init__(self)
+        self.point_model = point_model
+
+    def mouseDoubleClickEvent(self, event):
+        x, y = event.scenePos().x(), event.scenePos().y()
+        self.point_model.addPoint(Point(x, y))
+        index = self.point_model.index(self.point_model.rowCount() - 1)
+        self.addItem(self.graphicsItemClass(self.point_model, self, index))
+
+    def addItems(self):
+        for row in range(self.point_model.rowCount()):
+            index = self.point_model.index(row)
+            self.addItem(self.graphicsItemClass(self.point_model, self, index))
+
