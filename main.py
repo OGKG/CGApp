@@ -3,6 +3,7 @@ from PyQt5.QtGui import QPainter
 from PyQt5.QtWidgets import QApplication, QGraphicsView, QHBoxLayout, QListView, QWidget
 from base.point import PointListModel
 from algo.hull import JarvisPointScene, GrahamPointScene
+from algo.loci import LociPointScene
 
 
 class PointGraphicsView(QGraphicsView):
@@ -32,7 +33,7 @@ class Main(QWidget):
         layout.addWidget(listView)
 
         view = PointGraphicsView()
-        view.setScene(GrahamPointScene(model))
+        view.setScene(LociPointScene(model))
         layout.addWidget(view)
         self.setLayout(layout)
 
