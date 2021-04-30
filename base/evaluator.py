@@ -1,9 +1,5 @@
-from PyQt5.QtCore import QAbstractListModel
-
-
-class TaskModel(QAbstractListModel):
-    def __init__(self, points, parent=None, *args):
-        QAbstractListModel.__init__(self, parent, *args)
+class Evaluator:
+    def __init__(self, points):
         self.points = points
         self.stages = []
         self.correct_stages = []

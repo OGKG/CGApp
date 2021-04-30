@@ -26,15 +26,6 @@ class KdTreeTaskLayout(TaskLayout):
         self.addLayout(self.vlayout_left)
         self.addLayout(self.vlayout_right)
 
-        
-class KdTreeGraphicsView(QGraphicsView):
-    def wheelEvent(self, event):
-        if event.angleDelta().y() > 0:
-            factor = 1.25
-        else:
-            factor = 0.8
-        
-        self.scale(factor, factor)
 
 class KdTreeTaskModel(TaskModel):
     fines = [0.25, 0.75, 1, 1]

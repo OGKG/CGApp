@@ -1,9 +1,11 @@
+from base.algo_scene import AlgorithmPointScene
 from PyQt5.QtCore import QPointF
 from PyQt5.QtGui import QPolygonF
 from base.point import PointScene
 from base.polygon import PolygonGraphicsItem
 from module.algo.jarvis import jarvis
 from module.algo.graham import graham
+from module.algo.quickhull import quickhull_gen
 
 
 class HullPointScene(PointScene):
@@ -33,3 +35,5 @@ class GrahamPointScene(HullPointScene):
     def __init__(self, point_model):
         super(GrahamPointScene, self).__init__(point_model)
         self.hull_method = graham
+
+

@@ -5,7 +5,6 @@ from module.models.point import Point
 
 
 class PointListModel(QAbstractListModel):
-    
     def __init__(self, points=[], parent=None, *args):
         QAbstractListModel.__init__(self, parent, *args)
         self.points = points
@@ -94,4 +93,3 @@ class PointScene(QGraphicsScene):
         self.point_model.addPoint(Point(x, y))
         index = self.point_model.index(self.point_model.rowCount() - 1)
         self.addItem(self.graphicsItemClass(self.point_model, self, index))
-
