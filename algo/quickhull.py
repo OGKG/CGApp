@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtCore import Qt
 from base.point import PointGraphicsItem, PointScene
-from base.algorithm import Algorithm
+from base.algorithm import Algorithm, AlgorithmScene
 from base.evaluator import Evaluator
 from module.models.bin_tree_node import Node
 from module.models.bin_tree import BinTree
@@ -11,40 +11,56 @@ from module.algo.quickhull import quickhull_gen
 class QuickhullAlgorithm(Algorithm):
     method = quickhull_gen
 
-    def refresh(self):
-        self.stageResults = list(quickhull_gen(self.scene.point_model.points))
+    def __init__(self, scene):
+        super().__init__(scene)
+        self.stagesRenderMethods.extend(
+            [
+                self.renderStage0,
+                self.renderStage1,
+                self.renderStage2,
+                self.renderStage3
+            ]
+        )
+
+    def renderStage0(self):
+        self.scene = PointScene(self.scene.point_model)
+        self.setScenePoints()
 
     def renderStage1(self):
+        self.scene = QuickhullPointScene(self.scene.point_model)
+        self.setScenePoints()
+
         leftmost = self.stageResults[0][0]
         rightmost = self.stageResults[0][1]
         s1 = self.stageResults[0][2]
         s2 = self.stageResults[0][3]
-        
-        self.scene.clear()
-        self.setScenePoints()
-        self.refresh()
 
-        l_point = list(filter(lambda i: i.point == leftmost, self.graphicsView.scene.items()))[0]
-        r_point = list(filter(lambda i: i.point == rightmost, self.graphicsView.scene.items()))[0]
+        items = self.scene.items()
+        l_point = list(filter(lambda i: i.point == leftmost, items))[0]
+        r_point = list(filter(lambda i: i.point == rightmost, items))[0]
         l_point.setBrush(Qt.red)
         r_point.setBrush(Qt.red)
+
+        s1_points = list(filter(lambda i: i.point in s1, items))
+        s2_points = list(filter(lambda i: i.point in s2, items))
 
         # TODO: enumerate points s1 and s2-wise
 
     # TODO: write other stages' rendering
-
-class QuickhullPointGraphicsItem(PointGraphicsItem):
-    def __init__(self, point_model, scene, index):
-        super().__init__(point_model, scene, index)
-        self.setFlag(QGraphicsItem.ItemIsMovablem, False)
-        self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, False)
-
-
-class QuickhullPointScene(PointScene):
-    graphicsItemClass = QuickhullPointGraphicsItem
-
-    def mouseDoubleClickEvent(self, event):
+    def renderStage2(self):
         pass
+
+    def renderStage3(self):
+        pass
+
+class QuickhullPointScene(AlgorithmScene):
+    algorithmClass = QuickhullAlgorithm
+    stageIndex = 1
+
+
+class QuickhullResultScene(AlgorithmScene):
+    algorithmClass = QuickhullAlgorithm
+    stageIndex = 3
 
 
 class QuickhullEvaluator(Evaluator):
