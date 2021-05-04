@@ -1,5 +1,5 @@
 from operator import sub
-from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsItem, QGraphicsScene
+from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsItem, QGraphicsScene, QGraphicsTextItem
 from PyQt5.QtCore import QAbstractListModel, QPointF, QVariant, Qt, QModelIndex
 from module.models.point import Point
 
@@ -48,7 +48,7 @@ class PointListModel(QAbstractListModel):
 
 class PointGraphicsItem(QGraphicsEllipseItem):
     rad = 5
-    def __init__(self, point_model, scene, index):
+    def __init__(self, point_model, scene, index, brush=Qt.blue):
         super().__init__(-self.rad, -self.rad, 2*self.rad, 2*self.rad)
         self.point_model=point_model
         self.scene = scene
@@ -74,22 +74,37 @@ class PointGraphicsItem(QGraphicsEllipseItem):
         if change == QGraphicsItem.GraphicsItemChange.ItemChildAddedChange or\
             change == QGraphicsItem.GraphicsItemChange.ItemParentHasChanged:
             return super().itemChange(change, value)
+        
         if change != QGraphicsItem.GraphicsItemChange.ItemSceneChange\
         and change != QGraphicsItem.GraphicsItemChange.ItemSceneHasChanged:
             self.prepareGeometryChange()
             self.point_model.setDataByPoint(self.point, value, Qt.UserRole)
-            self.scene.refresh()
+            if change == QGraphicsItem.GraphicsItemChange.ItemPositionChange\
+            or change == QGraphicsItem.GraphicsItemChange.ItemPositionHasChanged:
+                self.scene.refresh()
         return super().itemChange(change, value)
+    
+    def attachValue(self, value):
+        text = QGraphicsTextItem(str(value))
+        text.moveBy(*self.point.coords)
+        self.scene.addItem(text)
+
+
 
 
 class PointScene(QGraphicsScene):
     graphicsItemClass = PointGraphicsItem
-    def __init__(self, point_model):
+    def __init__(self, point_model, view):
         QGraphicsScene.__init__(self)
         self.point_model = point_model
+        self.view = view
 
     def mouseDoubleClickEvent(self, event):
         x, y = event.scenePos().x(), event.scenePos().y()
         self.point_model.addPoint(Point(x, y))
         index = self.point_model.index(self.point_model.rowCount() - 1)
         self.addItem(self.graphicsItemClass(self.point_model, self, index))
+        self.refresh()
+
+    def refresh(self):
+        pass

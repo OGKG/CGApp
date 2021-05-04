@@ -4,13 +4,13 @@ from PyQt5.QtWidgets import QGraphicsView
 
 
 class GraphicsView(QGraphicsView):
-    def __init__(self, scene, parent=None):
+    def __init__(self, stageLabel, parent=None):
         super(GraphicsView, self).__init__(parent)
         self.setDragMode(QGraphicsView.DragMode.ScrollHandDrag)
         self.setRenderHint(QPainter.RenderHint.Antialiasing, True)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setScene(scene)
+        self.stageLabel = stageLabel
 
     def wheelEvent(self, event):
         factor = 0.8
