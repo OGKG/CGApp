@@ -1,3 +1,4 @@
+from base.text import GraphicsTextItem
 from algo.hull import QuickhullScene
 from base.tree_scene import TreeScene
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsScene, QGraphicsTextItem
@@ -75,7 +76,7 @@ class QuickhullPointScene(AlgorithmScene):
         
     def enumeratePoints(self, point_set):
         for p in point_set:
-            text = QGraphicsTextItem(str(p[0]))
+            text = GraphicsTextItem(str(p[0]))
             text.moveBy(*p[1].coords)
             self.textFields.append(text)
             self.addItem(text)

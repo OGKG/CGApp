@@ -1,3 +1,4 @@
+from base.text import GraphicsTextItem
 from PyQt5.QtCore import QPointF
 from PyQt5.QtGui import QPolygonF
 from PyQt5.QtWidgets import QGraphicsTextItem
@@ -29,7 +30,7 @@ class HullPointScene(PointScene):
     def enumeratePoints(self):
         hull = self.hull_method(self.point_model.points)
         for i in range(len(hull)):
-            text = QGraphicsTextItem(str(i+1))
+            text = GraphicsTextItem(str(i+1))
             text.moveBy(*hull[i].coords)
             text.setZValue(-2)
             self.textFields.append(text)

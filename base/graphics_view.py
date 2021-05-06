@@ -10,6 +10,7 @@ class GraphicsView(QGraphicsView):
         self.setRenderHint(QPainter.RenderHint.Antialiasing, True)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scale(1, -1)
         self.stageLabel = stageLabel
 
     def wheelEvent(self, event):
