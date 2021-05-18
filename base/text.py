@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QGraphicsTextItem
 
 class GraphicsTextItem(QGraphicsTextItem):
     def __init__(self, text):
-        super().__init__(text)
+        super().__init__()
+        self.setHtml(text)
         self.setRotation(180)
         self.setTransform(QTransform.fromScale(-1, 1))

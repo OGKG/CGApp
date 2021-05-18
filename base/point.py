@@ -48,7 +48,7 @@ class PointListModel(QAbstractListModel):
 
 class PointGraphicsItem(QGraphicsEllipseItem):
     rad = 5
-    def __init__(self, point_model, scene, index, brush=Qt.blue):
+    def __init__(self, point_model, scene, index):
         super().__init__(-self.rad, -self.rad, 2*self.rad, 2*self.rad)
         self.point_model=point_model
         self.scene = scene

@@ -212,14 +212,3 @@ class KdTreeNodeGraphicsItem(QGraphicsEllipseItem):
         super().__init__(0, 0, 2*self.rad, 2*self.rad)
         shift = tuple(map(sub, (x, y), (self.rad, self.rad)))
         self.moveBy(*shift)
-    
-    def paint(self, painter, option, widget):
-        font = painter.font()
-        font.setPointSize(self.textSize)
-        painter.setFont(font)
-        painter.drawText(
-            self.pos().x(),
-            self.pos().y(),
-            self.text
-        )
-        super().paint(painter, option, widget)
