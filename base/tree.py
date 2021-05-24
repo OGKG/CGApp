@@ -7,7 +7,7 @@ class BinTreeNodeGraphicsItem(QGraphicsEllipseItem):
     rad = 20
     textSize = 10
 
-    def __init__(self, text, content, depth=0):
+    def __init__(self, text, content=None, depth=0):
         """
             Initializes a binary tree node as the circle.
             Text is shown inside the circle,
@@ -20,16 +20,27 @@ class BinTreeNodeGraphicsItem(QGraphicsEllipseItem):
         self.setToolTip(content)
 
 
+class BinTreeSquareNodeGraphicsItem(QGraphicsRectItem):
+    width = 40
+    textSize = 10
+
+    def __init__(self, text, content=None, depth=0):
+        self.text = text
+        self.content = content
+        self.depth = depth
+        super().__init__(-self.width/2, -self.width/2, self.width, self.width)
+        self.setToolTip(content)
+
+
 class BinTreeScene(QGraphicsScene):
     rad = BinTreeNodeGraphicsItem.rad
 
-    def __init__(self, tree, point_model, width, height):
+    def __init__(self, tree, width, height):
         QGraphicsScene.__init__(self)
         rect = QGraphicsRectItem(0, 0, width+100, height)
         rect.setPen(Qt.white)
         self.addItem(rect)
         self.tree = tree
-        self.point_model = point_model
         self.constructTree()
     
     def paint(self, painter, option, widget):
@@ -42,9 +53,5 @@ class BinTreeScene(QGraphicsScene):
         td.drawContents(painter)
         super().paint(painter, option, widget)
 
-    def constructTree(self, depth_list):
+    def constructTree(self):
         pass
-
-    def nodeText():
-        pass
-

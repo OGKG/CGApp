@@ -54,6 +54,7 @@ class AlgorithmLayout(QHBoxLayout):
     algorithmClass = Algorithm
     algorithmName = ""
     extraViews = []
+    initSceneClass = PointScene
 
     def __init__(self, point_model, parent=None):
         super(AlgorithmLayout, self).__init__(parent)
@@ -74,7 +75,7 @@ class AlgorithmLayout(QHBoxLayout):
         self.vLayoutLeft.addWidget(self.pointsListView)
 
         self.viewLayout.addWidget(self.stageLabel)
-        self.scene = PointScene(self.point_model, self.view)
+        self.scene = self.initSceneClass(self.point_model, self.view)
         self.view.setScene(self.scene)
         self.algorithm.setSceneAndPointModel(self.scene)
         self.viewLayout.addWidget(self.view)

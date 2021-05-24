@@ -8,7 +8,6 @@ from PyQt5.QtWidgets import QGraphicsItem, QGraphicsLineItem, QGraphicsScene, QG
 from PyQt5.QtCore import Qt
 from base.point import PointGraphicsItem, PointScene
 from base.algorithm import Algorithm, AlgorithmScene, AlgorithmLayout
-from base.evaluator import Evaluator
 from module.models.bin_tree_node import Node
 from module.models.bin_tree import BinTree
 from module.algo.quickhull import quickhull_gen
@@ -188,6 +187,7 @@ class QuickhullLayout(AlgorithmLayout):
     algorithmName = "Метод Швидкобол"
     stageCount = 3
     algorithmClass = QuickhullAlgorithm
+    initSceneClass = PointScene
 
     def __init__(self, point_model, parent=None):
         self.treeView = ExtraView()

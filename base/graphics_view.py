@@ -12,6 +12,7 @@ class GraphicsView(QGraphicsView):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scale(1, -1)
         self.stageLabel = stageLabel
+        self.setMouseTracking(True)
 
     def wheelEvent(self, event):
         factor = 0.8
@@ -20,9 +21,9 @@ class GraphicsView(QGraphicsView):
         else:
             self.scale(factor, factor)
 
-class ExtraView(GraphicsView):
+class ExtraView(QGraphicsView):
     def __init__(self, parent=None):
-        super(GraphicsView, self).__init__(parent)
+        super().__init__(parent)
         self.setDragMode(QGraphicsView.DragMode.ScrollHandDrag)
         self.setRenderHint(QPainter.RenderHint.Antialiasing, True)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
