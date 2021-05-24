@@ -1,20 +1,19 @@
-from base.algorithm import AlgorithmLayout
-from algo.quickhull import QuickhullAlgorithm, QuickhullLayout
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPainter
-from PyQt5.QtWidgets import QApplication, QGraphicsView, QHBoxLayout, QListView, QWidget
-from base.point import PointListModel, PointScene
-from base.graphics_view import GraphicsView
-from algo.hull import JarvisPointScene, GrahamPointScene
-from algo.loci import LociPointScene
+from PyQt5.QtWidgets import QApplication, QToolBar, QWidget
+from algo.kd_tree import KdTreeLayout, KdTreePointListModel
+from algo.quickhull import QuickhullLayout
+from base.point import PointListModel
 
-            
 
 class Main(QWidget):
+    layoutClasses = [KdTreeLayout, QuickhullLayout]
+
     def __init__(self):
         super().__init__()
-        model = PointListModel()
-        layout = QuickhullLayout(model)
+        toolbar = QToolBar()
+        toolbar.addAction("Метод")
+
+        model = KdTreePointListModel()
+        layout = KdTreeLayout(model)
         self.setLayout(layout)
 
 

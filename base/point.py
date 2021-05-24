@@ -1,5 +1,5 @@
 from operator import sub
-from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsItem, QGraphicsScene, QGraphicsTextItem
+from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsItem, QGraphicsScene, QGraphicsSceneMouseEvent, QGraphicsTextItem
 from PyQt5.QtCore import QAbstractListModel, QPointF, QVariant, Qt, QModelIndex
 from module.models.point import Point
 
@@ -48,7 +48,7 @@ class PointListModel(QAbstractListModel):
 
 class PointGraphicsItem(QGraphicsEllipseItem):
     rad = 5
-    def __init__(self, point_model, scene, index, brush=Qt.blue):
+    def __init__(self, point_model, scene, index):
         super().__init__(-self.rad, -self.rad, 2*self.rad, 2*self.rad)
         self.point_model=point_model
         self.scene = scene
@@ -83,13 +83,6 @@ class PointGraphicsItem(QGraphicsEllipseItem):
             or change == QGraphicsItem.GraphicsItemChange.ItemPositionHasChanged:
                 self.scene.refresh()
         return super().itemChange(change, value)
-    
-    def attachValue(self, value):
-        text = QGraphicsTextItem(str(value))
-        text.moveBy(*self.point.coords)
-        self.scene.addItem(text)
-
-
 
 
 class PointScene(QGraphicsScene):

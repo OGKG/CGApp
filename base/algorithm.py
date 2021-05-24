@@ -5,10 +5,11 @@ from PyQt5.QtWidgets import QHBoxLayout, QLabel, QListView, QPushButton, QVBoxLa
 
 class Algorithm:
     """Represents an algorithm to solve the problem in interactive mode."""
-    def __init__(self, view):
+    def __init__(self, view, extraViews=[]):
         self.stagesRenderMethods = []
         self.stageResults = []
         self.view = view
+        self.extraViews = extraViews
     
     def setSceneAndPointModel(self, scene):
         self.scene = scene
@@ -52,6 +53,8 @@ class AlgorithmLayout(QHBoxLayout):
     stageCount = 0
     algorithmClass = Algorithm
     algorithmName = ""
+    extraViews = []
+    initSceneClass = PointScene
 
     def __init__(self, point_model, parent=None):
         super(AlgorithmLayout, self).__init__(parent)
@@ -59,10 +62,11 @@ class AlgorithmLayout(QHBoxLayout):
         self.stageLabel = QLabel("Етап 0. Умова")
         self.view = GraphicsView(self.stageLabel)
         self.point_model = point_model
-        self.algorithm = self.algorithmClass(self.view)
+        self.algorithm = self.algorithmClass(self.view, self.extraViews)
 
         self.vLayoutLeft = QVBoxLayout()
         self.vLayoutRight = QVBoxLayout()
+        self.viewLayout = QVBoxLayout()
         self.hLayout = QHBoxLayout()
 
         self.vLayoutLeft.addWidget(self.algorithmLabel)
@@ -70,17 +74,21 @@ class AlgorithmLayout(QHBoxLayout):
         self.pointsListView.setModel(self.point_model)
         self.vLayoutLeft.addWidget(self.pointsListView)
 
-        self.vLayoutRight.addWidget(self.stageLabel)
-        self.scene = PointScene(self.point_model, self.view)
+        self.viewLayout.addWidget(self.stageLabel)
+        self.scene = self.initSceneClass(self.point_model, self.view)
         self.view.setScene(self.scene)
         self.algorithm.setSceneAndPointModel(self.scene)
-        self.vLayoutRight.addWidget(self.view)
+        self.viewLayout.addWidget(self.view)
+        
+        for view in self.extraViews:
+            self.viewLayout.addWidget(view)
 
         btn_layout = QHBoxLayout()
         for i in range(self.stageCount):
             btn = StageButton(i, self)
             btn_layout.addWidget(btn)
         
+        self.vLayoutRight.addLayout(self.viewLayout)
         self.vLayoutRight.addLayout(btn_layout)
         self.addLayout(self.vLayoutLeft)
         self.addLayout(self.vLayoutRight)
