@@ -285,6 +285,8 @@ class KdTreeScene(BinTreeScene):
     def constructTree(self):
         root_item = BinTreeNodeGraphicsItem(str(self.tree.root.data))
         root_item.setBrush(Qt.white)
+        if self.tree.root.data in self.regionPoints:
+            root_item.setPen(Qt.green)
         self.addItem(root_item)
         x, y = (self.width() - self.nodeWidth) / 2, self.nodeWidth / 2
         root_item.moveBy(x, y)
