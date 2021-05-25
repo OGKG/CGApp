@@ -43,6 +43,7 @@ class RectGraphicsItem(QGraphicsRectItem):
         self.handleSelected = None
         self.mousePressPos = None
         self.mousePressRect = None
+        self.mouseReleased = True
         self.setAcceptHoverEvents(True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
@@ -75,11 +76,12 @@ class RectGraphicsItem(QGraphicsRectItem):
         """
         Executed when the mouse moves over the shape (NOT PRESSED).
         """
-        handle = self.handleAt(moveEvent.pos())
-        cursor = Qt.OpenHandCursor if handle is None else self.handleCursors[handle]
-        if self.isCursorInMoveAllowedArea(moveEvent.pos().x(), moveEvent.pos().y()):
-            cursor = Qt.SizeAllCursor
-        self.setCursor(cursor)
+        if self.isSelected():
+            handle = self.handleAt(moveEvent.pos())
+            cursor = Qt.OpenHandCursor if handle is None else self.handleCursors[handle]
+            if self.isCursorInMoveAllowedArea(moveEvent.pos().x(), moveEvent.pos().y()):
+                cursor = Qt.SizeAllCursor
+            self.setCursor(cursor)
         super().hoverMoveEvent(moveEvent)
 
     def hoverLeaveEvent(self, moveEvent):
@@ -98,7 +100,9 @@ class RectGraphicsItem(QGraphicsRectItem):
             self.mousePressPos = mouseEvent.pos()
             self.mousePressRect = self.boundingRect()
 
-        if not self.isCursorInMoveAllowedArea(mouseEvent.pos().x(), mouseEvent.pos().y()):
+        if self.isCursorInMoveAllowedArea(mouseEvent.pos().x(), mouseEvent.pos().y()):
+            self.mouseReleased = False
+        else:
             self.setFlag(QGraphicsItem.ItemIsMovable, False)
         super().mousePressEvent(mouseEvent)
 
@@ -116,6 +120,7 @@ class RectGraphicsItem(QGraphicsRectItem):
         """
         Executed when the mouse is released from the item.
         """
+        self.mouseReleased = True
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         super().mouseReleaseEvent(mouseEvent)
         self.setCursor(Qt.OpenHandCursor)
@@ -123,6 +128,8 @@ class RectGraphicsItem(QGraphicsRectItem):
         self.mousePressPos = None
         self.mousePressRect = None
         self.update()
+        if self.scene:
+            self.scene.refresh()
 
     def boundingRect(self):
         """
@@ -252,6 +259,8 @@ class RectGraphicsItem(QGraphicsRectItem):
 
         self.pointModel.xRange = [self.x(), self.x() + self.boundingRect().width()]
         self.pointModel.yRange = [self.y(), self.y() + self.boundingRect().height()]
+        if self.scene:
+            self.scene.refresh()
 
     def shape(self):
         """
@@ -269,8 +278,11 @@ class RectGraphicsItem(QGraphicsRectItem):
         Paint the node in the graphic view.
         """
         pen = QPen()
-        pen.setColor(Qt.blue)
-        pen.setStyle(Qt.DashLine)
+        if self.isSelected():
+            pen.setColor(QColor(255,128,0))
+        if self.mouseReleased:
+            pen.setColor(Qt.blue)
+        
         painter.setPen(pen)
         painter.drawRect(self.rect())
 

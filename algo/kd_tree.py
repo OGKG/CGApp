@@ -338,6 +338,6 @@ class KdTreeLayout(AlgorithmLayout):
     def __init__(self, point_model, parent=None):
         self.treeView = ExtraView()
         self.treeView.setVisible(False)
-        self.extraViews.append(self.treeView)
+        self.extraViews = [self.treeView]
         super().__init__(point_model, parent)
         self.scene.setSearchRegion(*point_model.xRange, *point_model.yRange)

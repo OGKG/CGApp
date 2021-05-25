@@ -49,7 +49,7 @@ class QuickhullAlgorithm(Algorithm):
         self.overwriteTreeNodes(tree.root, s)
 
         extraView = self.extraViews[0]
-        tree_scene = QuickhullTreeScene(tree, self.point_model, extraView.width(), extraView.height())
+        tree_scene = QuickhullTreeScene(tree, extraView.width(), extraView.height())
         extraView.setScene(tree_scene)
         extraView.setVisible(True)
 
@@ -140,7 +140,7 @@ class QuickhullPointScene(AlgorithmScene):
         tree = self.algorithm.stageResults[3]
         self.algorithm.overwriteTreeNodes(tree.root, s)
         extraView = self.algorithm.extraViews[0]
-        self.treeScene = QuickhullTreeScene(tree, self.point_model, extraView.width(), extraView.height())
+        self.treeScene = QuickhullTreeScene(tree, extraView.width(), extraView.height())
         extraView.setScene(self.treeScene)
 
 
