@@ -2,7 +2,7 @@ from base.text import GraphicsTextItem
 from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtGui import QPen, QPolygonF
 from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsTextItem
-from base.point import PointScene
+from base.point import PointGraphicsItem, PointScene
 from base.polygon import PolygonGraphicsItem
 from module.algo.jarvis import jarvis
 from module.algo.graham import graham
@@ -56,8 +56,18 @@ class JarvisPointScene(HullPointScene):
             if isinstance(i, QGraphicsLineItem):
                 self.removeItem(i)
 
+
         hull = self.hull_method(self.point_model.points)
         pts = hull + [hull[0]]
+
+
+        point_items = list(filter(lambda i: isinstance(i, PointGraphicsItem), self.items()))
+        for p in point_items:
+            p.setBrush(Qt.blue)
+
+        min_point = min(point_items, key=lambda p:p.x())
+        min_point.setBrush(Qt.green)
+
         for i in range(len(pts)-1):
             dx, dy = pts[i+1].x - pts[i].x, pts[i+1].y - pts[i].y
             line = QGraphicsLineItem(pts[i+1].x, pts[i+1].y, pts[i+1].x+dx, pts[i+1].y+dy)
@@ -69,7 +79,8 @@ class JarvisPointScene(HullPointScene):
             h_line = QGraphicsLineItem(pts[i].x, pts[i].y, pts[i+1].x, pts[i+1].y)
             h_line.setPen(Qt.red)
             h_line.setZValue(-1)
-        
+
+
         self.enumeratePoints()
         
 

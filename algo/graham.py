@@ -103,6 +103,9 @@ class GrahamPointScene(AlgorithmScene):
         for i in first3Items:
             i.setBrush(Qt.yellow)
         
+        min_point = min(self.items(), key=lambda p: (p.y(), p.x()))
+        min_point.setBrush(Qt.green)
+
         self.setOrigin()
         self.drawLinesFromOriginToPoints()
         self.drawEdges()
